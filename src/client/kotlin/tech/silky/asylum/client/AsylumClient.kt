@@ -1,11 +1,8 @@
 package tech.silky.asylum.client
 
 import net.fabricmc.api.ClientModInitializer
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.state.BreakingBlockRenderState
-import net.minecraft.resource.Resource
 import net.minecraft.resource.ResourceManager
 import net.minecraft.resource.ResourceType
 import net.minecraft.resource.SynchronousResourceReloader
@@ -54,7 +51,7 @@ class AsylumClient : ClientModInitializer {
         }.forEach { (id, resource) ->
             val content = resource.inputStream.readBytes().toString(StandardCharsets.UTF_8)
 
-            scripts[id] = AsylumLua.globals.load(content);
+            scripts[id] = AsylumLua.globals.load(content)
             println("Loaded Lua: $id (${content.length} bytes)")
         }
     }

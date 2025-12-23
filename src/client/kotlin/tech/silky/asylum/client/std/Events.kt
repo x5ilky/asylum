@@ -1,11 +1,8 @@
 package tech.silky.asylum.client.std
 
-import net.minecraft.text.Text
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
-import org.luaj.vm2.LuaValue.NIL
 import org.luaj.vm2.lib.OneArgFunction
-import org.luaj.vm2.lib.ZeroArgFunction
 
 object Events {
     var eventCount = 1000

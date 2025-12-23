@@ -1,9 +1,7 @@
 package tech.silky.asylum.client.std.block
 
 import net.minecraft.util.math.BlockPos
-import org.luaj.vm2.Lua
 import org.luaj.vm2.LuaValue
-import org.luaj.vm2.lib.OneArgFunction
 import tech.silky.asylum.client.luaTable
 import tech.silky.asylum.client.std.position.World
 

@@ -1,12 +1,8 @@
 package tech.silky.asylum.client.std
 
-import net.minecraft.client.MinecraftClient
 import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.text.Text
-import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
-import org.luaj.vm2.lib.OneArgFunction
-import org.luaj.vm2.lib.ZeroArgFunction
 import tech.silky.asylum.client.luaTable
 import tech.silky.asylum.client.std.position.World
 
