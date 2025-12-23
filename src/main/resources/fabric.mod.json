@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "asylum",
+  "version": "${version}",
+  "name": "Asylum",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/asylum/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-datagen": [
+      "tech.silky.asylum.client.AsylumDataGenerator"
+    ],
+    "client": [
+      "tech.silky.asylum.client.AsylumClient"
+    ],
+    "main": [
+      "tech.silky.asylum.Asylum"
+    ]
+  },
+  "mixins": [
+    "asylum.mixins.json",
+    {
+      "config": "asylum.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-language-kotlin": ">=${kotlin_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
