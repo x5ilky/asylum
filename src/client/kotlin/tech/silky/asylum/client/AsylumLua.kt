@@ -6,7 +6,7 @@ import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.lib.*
 import org.luaj.vm2.lib.jse.JseBaseLib
 import org.luaj.vm2.lib.jse.JseMathLib
-import tech.silky.asylum.client.std.Events
+import tech.silky.asylum.client.std.AEvents
 
 
 data class AsylumHook (val hook: (a: AsylumLua) -> Unit, val id: Int)
@@ -37,7 +37,9 @@ object AsylumLua {
         hooks.removeIf { it.id == id }
     }
     fun reload() {
-        Events.events["block_break"]!!.clear()
+        for ((_, v) in AEvents.events) {
+            v.clear()
+        }
         for (hook in hooks) {
             hook.hook(this)
         }

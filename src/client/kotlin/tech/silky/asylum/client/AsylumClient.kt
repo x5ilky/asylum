@@ -1,6 +1,7 @@
 package tech.silky.asylum.client
 
 import net.fabricmc.api.ClientModInitializer
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
 import net.minecraft.client.MinecraftClient
 import net.minecraft.resource.ResourceManager
@@ -12,7 +13,8 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.luaj.vm2.LuaValue
 import tech.silky.asylum.client.events.ClientBlockBreakListener
-import tech.silky.asylum.client.std.MinecraftLib
+import tech.silky.asylum.client.events.ClientDamageEntityListener
+import tech.silky.asylum.client.std.AMinecraftLib
 import java.nio.charset.StandardCharsets
 
 
@@ -25,10 +27,11 @@ class AsylumClient : ClientModInitializer {
     override fun onInitializeClient() {
         AsylumLua.init()
         AsylumLua.hook { alua ->
-            alua.globals.load(MinecraftLib)
+            alua.globals.load(AMinecraftLib)
         }
 
         ClientBlockBreakListener.init()
+        ClientDamageEntityListener.init()
 
         ResourceLoader.get(ResourceType.CLIENT_RESOURCES).registerReloader(
             Identifier.of(MOD_ID, "lua_reloader"),
@@ -40,6 +43,19 @@ class AsylumClient : ClientModInitializer {
                 }
             }
         )
+        HudRenderCallback.EVENT.register { drawContext, tickDelta ->
+            val client = MinecraftClient.getInstance()
+            val textRenderer = client.textRenderer
+
+            drawContext.drawText(
+                textRenderer,
+                "Hello world",
+                10,
+                10,
+                0xFFFFFF,
+                true
+            )
+        }
     }
 
     private fun loadAllLua(manager: ResourceManager) {
@@ -51,7 +67,7 @@ class AsylumClient : ClientModInitializer {
         }.forEach { (id, resource) ->
             val content = resource.inputStream.readBytes().toString(StandardCharsets.UTF_8)
 
-            scripts[id] = AsylumLua.globals.load(content)
+            scripts[id] = AsylumLua.globals.load(content, id.toString())
             println("Loaded Lua: $id (${content.length} bytes)")
         }
     }
@@ -59,7 +75,9 @@ class AsylumClient : ClientModInitializer {
         val player = MinecraftClient.getInstance().player
         for ((k, v) in scripts) {
             player?.sendMessage(Text.of("Executing script: $k"), false)
-            v.call()
+            tryCall {
+                v.call()
+            }
         }
     }
 }
