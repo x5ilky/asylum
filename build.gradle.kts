@@ -5,6 +5,13 @@ plugins {
     kotlin("jvm") version "2.3.0"
     id("fabric-loom") version "1.14-SNAPSHOT"
     id("maven-publish")
+    id("com.gradleup.shadow") version "9.3.0"
+}
+
+val transitiveInclude: Configuration by configurations.creating {
+    exclude(group = "com.mojang")
+    exclude(group = "org.jetbrains.kotlin")
+    exclude(group = "org.jetbrains.kotlinx")
 }
 
 version = project.property("mod_version") as String
@@ -38,6 +45,7 @@ fabricApi {
     configureDataGeneration {
         client = true
     }
+
 }
 
 repositories {
@@ -48,6 +56,7 @@ repositories {
     // for more information about repositories.
 }
 
+
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
@@ -56,9 +65,14 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:${project.property("kotlin_loader_version")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
     modImplementation("net.fabricmc.fabric-api:fabric-events-interaction-v0:${project.property("fabric_version")}")
-    implementation("org.luaj:luaj-jse:3.0.1")
+    implementation("org.luaj", "luaj-jse", "3.0.1")
+    include("org.luaj", "luaj-jse", "3.0.1")
 }
 
+tasks.remapJar {
+    classpath.from(file("extern/luaj-jse-3.0.2.jar"))
+    addNestedDependencies = true
+}
 
 tasks.processResources {
     inputs.property("version", project.version)

@@ -15,6 +15,7 @@ object AEvents {
     private fun initEvents() {
         events["block_break"] = mutableMapOf()
         events["player_damage_entity"] = mutableMapOf()
+        events["disable"] = mutableMapOf()
     }
 
     fun makeObject(): LuaTable {
@@ -31,6 +32,13 @@ object AEvents {
             override fun call(arg: LuaValue): LuaValue {
                 val id = eventCount++
                 events["player_damage_entity"]!![id] = arg
+                return NIL
+            }
+        })
+        table.set("on_disable", object : OneArgFunction() {
+            override fun call(arg: LuaValue): LuaValue {
+                val id = eventCount++
+                events["disable"]!![id] = arg
                 return NIL
             }
         })

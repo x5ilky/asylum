@@ -1,5 +1,6 @@
 package tech.silky.asylum.client
 
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.compiler.LuaC
@@ -7,6 +8,7 @@ import org.luaj.vm2.lib.*
 import org.luaj.vm2.lib.jse.JseBaseLib
 import org.luaj.vm2.lib.jse.JseMathLib
 import tech.silky.asylum.client.std.AEvents
+import tech.silky.asylum.client.std.hud.AHudLib
 
 
 data class AsylumHook (val hook: (a: AsylumLua) -> Unit, val id: Int)
@@ -37,6 +39,16 @@ object AsylumLua {
         hooks.removeIf { it.id == id }
     }
     fun reload() {
+        for ((_, v) in AEvents.events["disable"]!!) {
+            tryCall {
+                v.call()
+            }
+        }
+        for ((_, v) in AHudLib.guiLayers) {
+            HudElementRegistry.removeElement(v)
+        }
+        AHudLib.guiLayers.clear()
+
         for ((_, v) in AEvents.events) {
             v.clear()
         }

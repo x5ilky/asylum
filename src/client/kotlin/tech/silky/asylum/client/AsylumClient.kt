@@ -1,7 +1,8 @@
 package tech.silky.asylum.client
 
 import net.fabricmc.api.ClientModInitializer
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
 import net.minecraft.client.MinecraftClient
 import net.minecraft.resource.ResourceManager
@@ -9,6 +10,7 @@ import net.minecraft.resource.ResourceType
 import net.minecraft.resource.SynchronousResourceReloader
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import net.minecraft.util.Util
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.luaj.vm2.LuaValue
@@ -16,10 +18,14 @@ import tech.silky.asylum.client.events.ClientBlockBreakListener
 import tech.silky.asylum.client.events.ClientDamageEntityListener
 import tech.silky.asylum.client.std.AMinecraftLib
 import java.nio.charset.StandardCharsets
+import kotlin.math.abs
+import kotlin.math.sin
 
 
 class AsylumClient : ClientModInitializer {
-    val MOD_ID = "asylum"
+    companion object {
+        val MOD_ID = "asylum"
+    }
     val LOGGER: Logger = LogManager.getLogger(MOD_ID)
 
     var scripts = mutableMapOf<Identifier, LuaValue>()
@@ -43,19 +49,6 @@ class AsylumClient : ClientModInitializer {
                 }
             }
         )
-        HudRenderCallback.EVENT.register { drawContext, tickDelta ->
-            val client = MinecraftClient.getInstance()
-            val textRenderer = client.textRenderer
-
-            drawContext.drawText(
-                textRenderer,
-                "Hello world",
-                10,
-                10,
-                0xFFFFFF,
-                true
-            )
-        }
     }
 
     private fun loadAllLua(manager: ResourceManager) {

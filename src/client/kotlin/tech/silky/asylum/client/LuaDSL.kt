@@ -3,13 +3,16 @@ package tech.silky.asylum.client
 import net.minecraft.client.MinecraftClient
 import net.minecraft.text.Style
 import net.minecraft.text.Text
+import org.luaj.vm2.Lua
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
+import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
+import org.luaj.vm2.lib.VarArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import org.luaj.vm2.lib.jse.CoerceJavaToLua
 
@@ -40,8 +43,42 @@ class LuaTableBuilder {
         }
     }
     fun fn(name: String, body: (LuaValue, LuaValue, LuaValue, LuaValue) -> LuaValue) {
-        table[name] = object : LibFunction() {
-            override fun call(a: LuaValue, b: LuaValue, c: LuaValue, d: LuaValue): LuaValue = body(a, b, c, d)
+        table[name] = object : VarArgFunction() {
+            override fun invoke(args: Varargs): Varargs {
+                return body(
+                    args.arg(1),
+                    args.arg(2),
+                    args.arg(3),
+                    args.arg(4),
+                )
+            }
+        }
+    }
+    fun fn(name: String, body: (LuaValue, LuaValue, LuaValue, LuaValue, LuaValue) -> LuaValue) {
+        table[name] = object : VarArgFunction() {
+            override fun invoke(args: Varargs): Varargs {
+                return body(
+                    args.arg(1),
+                    args.arg(2),
+                    args.arg(3),
+                    args.arg(4),
+                    args.arg(5),
+                )
+            }
+        }
+    }
+    fun fn(name: String, body: (LuaValue, LuaValue, LuaValue, LuaValue, LuaValue, LuaValue) -> LuaValue) {
+        table[name] = object : VarArgFunction() {
+            override fun invoke(args: Varargs): Varargs {
+                return body(
+                    args.arg(1),
+                    args.arg(2),
+                    args.arg(3),
+                    args.arg(4),
+                    args.arg(5),
+                    args.arg(6),
+                )
+            }
         }
     }
 
