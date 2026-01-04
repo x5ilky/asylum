@@ -7,6 +7,7 @@ import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.lib.*
 import org.luaj.vm2.lib.jse.JseBaseLib
 import org.luaj.vm2.lib.jse.JseMathLib
+import tech.silky.asylum.client.std.AEventType
 import tech.silky.asylum.client.std.AEvents
 import tech.silky.asylum.client.std.hud.AHudLib
 
@@ -39,7 +40,8 @@ object AsylumLua {
         hooks.removeIf { it.id == id }
     }
     fun reload() {
-        for ((_, v) in AEvents.events["disable"]!!) {
+        AsylumClient.LOGGER.info("Reloading Asylum...")
+        for ((_, v) in AEvents.events[AEventType.DISABLE]!!) {
             tryCall {
                 v.call()
             }

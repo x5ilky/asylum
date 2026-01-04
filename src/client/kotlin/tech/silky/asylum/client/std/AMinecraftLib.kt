@@ -6,28 +6,28 @@ import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
+import tech.silky.asylum.client.luaTable
 import tech.silky.asylum.client.std.hud.AHudLib
+import tech.silky.asylum.client.std.text.ATextLib
 
 object AMinecraftLib : TwoArgFunction() {
     lateinit var globals: Globals
     override fun call(modname: LuaValue, env: LuaValue): LuaValue {
         globals = env.checkglobals()
-        val mc = LuaTable()
-        mc.set("get_player", GetPlayer)
-        mc.set("events", AEvents.makeObject())
-        mc.set("identifier", AIdentifier.lib)
-        mc.set("client_player", AClientPlayer.lib)
-        mc.set("hud", AHudLib.lib)
+        val mc = luaTable {
+            value("events", AEvents.makeObject())
+            value("identifier", AIdentifier.lib)
+            value("client_player", AClientPlayer.lib)
+            value("hud", AHudLib.lib)
+            value("events", AEvents.makeObject())
+            value("text", ATextLib.lib)
 
+            fn("get_time") { ->
+                return@fn valueOf(System.currentTimeMillis().toDouble());
+            }
+        }
         env.set("mc", mc)
         env.get("package").get("loaded").set("mc", mc)
         return mc
-    }
-
-    object GetPlayer : ZeroArgFunction() {
-        override fun call(): LuaValue {
-            val player = MinecraftClient.getInstance().player ?: return NIL
-            return AClientPlayer.makePlayer(player)
-        }
     }
 }

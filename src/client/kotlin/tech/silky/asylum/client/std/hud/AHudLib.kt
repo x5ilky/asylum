@@ -7,7 +7,9 @@ import org.luaj.vm2.LuaValue
 import tech.silky.asylum.client.AsylumClient
 import tech.silky.asylum.client.luaTable
 import tech.silky.asylum.client.std.AIdentifier
+import tech.silky.asylum.client.std.ATypes
 import tech.silky.asylum.client.tryCall
+import tech.silky.asylum.client.typecheck
 
 object AHudLib {
     val guiLayers = mutableMapOf<Int, Identifier>()
@@ -42,6 +44,7 @@ object AHudLib {
         })
 
         fn("add_before") { layerRaw, fn ->
+            typecheck { layerRaw with ATypes.IDENTIFIER; fn with ATypes.FUNCTION }
             val layer = AIdentifier.from(layerRaw)
             val c = guiCount++
             val id = Identifier.of(AsylumClient.MOD_ID, "asylum_userguilayer$guiCount")
@@ -58,7 +61,26 @@ object AHudLib {
 
             return@fn LuaValue.valueOf(c)
         }
+        fn("add_after") { layerRaw, fn ->
+            typecheck { layerRaw with ATypes.IDENTIFIER; fn with ATypes.FUNCTION }
+            val layer = AIdentifier.from(layerRaw)
+            val c = guiCount++
+            val id = Identifier.of(AsylumClient.MOD_ID, "asylum_userguilayer$guiCount")
+            guiLayers[c] = id
+
+            HudElementRegistry.attachElementAfter(layer, id) { context, tickCounter ->
+                tryCall {
+                    fn.call(
+                        ADrawContext.make(context),
+                        LuaValue.valueOf(tickCounter.dynamicDeltaTicks.toDouble())
+                    )
+                }
+            }
+
+            return@fn LuaValue.valueOf(c)
+        }
         fn("remove") { id ->
+            typecheck { id with ATypes.INTEGER }
             if (guiLayers.containsKey(id.toint())) {
                 HudElementRegistry.removeElement(guiLayers[id.toint()]!!)
                 guiLayers.remove(id.toint())

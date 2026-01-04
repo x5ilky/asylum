@@ -1,20 +1,19 @@
 package tech.silky.asylum.client
 
 import net.minecraft.client.MinecraftClient
-import net.minecraft.text.Style
 import net.minecraft.text.Text
-import org.luaj.vm2.Lua
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
-import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import org.luaj.vm2.lib.jse.CoerceJavaToLua
+import tech.silky.asylum.client.std.ATypes
+import kotlin.math.abs
 
 class LuaTableBuilder {
     private val table = LuaTable()
@@ -113,6 +112,64 @@ class LuaTableBuilder {
 
 fun luaTable(init: LuaTableBuilder.() -> Unit): LuaTable =
     LuaTableBuilder().apply(init).build()
+
+@DslMarker
+annotation class PairDsl
+
+@PairDsl
+class PairBuilder<A> {
+    internal val list = mutableListOf<Pair<A, Typechecker>>()
+
+    infix fun A.with(b: Typechecker) {
+        list += this to b
+    }
+    infix fun A.with(b: String) {
+        list += this to Typechecker(
+            when (b) {
+                ATypes.BOOLEAN -> { v: LuaValue -> v.isboolean() to "expected boolean" }
+                ATypes.INTEGER -> { v: LuaValue -> v.isnumber() to "expected integer" }
+                ATypes.DOUBLE -> { v: LuaValue -> v.isnumber() to "expected number" }
+                ATypes.STRING -> { v: LuaValue -> v.isstring() to "expected string" }
+                ATypes.FUNCTION -> { v: LuaValue -> v.isfunction() to "expected function" }
+                ATypes.TABLE -> { v: LuaValue -> v.istable() to "expected table" }
+                ATypes.NIL -> { v: LuaValue -> v.isnil() to "expected nil" }
+                else ->
+                    { v: LuaValue -> (v.get("__type").toString() == b) to "expected $b" }
+            },
+            b
+        )
+    }
+}
+
+const val IOBJ = "__iobj"
+data class Typechecker (
+    val validator: (LuaValue) -> Pair<Boolean, String>,
+    val name: String
+)
+fun typecheck(block: PairBuilder<LuaValue>.() -> Unit) {
+    val l = PairBuilder<LuaValue>().apply(block).list
+    var i = 0
+    for ((vl, typ) in l) {
+        i++
+        val result = typ.validator(vl)
+        if (!result.first)
+            throw LuaError("Mismatched argument type, argument $i expected ${typ.name}, got ${vl.typename()}\n${result.second}")
+    }
+}
+fun tableOf(typename: String, block: PairBuilder<String>.() -> Unit): Typechecker {
+    return Typechecker({ table: LuaValue ->
+        val l = PairBuilder<String>().apply(block).list
+        var i = 0
+        for ((vl, typ) in l) {
+            i++
+            val result = typ.validator(table.get(vl))
+            if (!result.first)
+                return@Typechecker false to "Mismatched argument type, argument $i expected ${typ.name}, got ${table.get(vl).typename()}\n" + result.second
+        }
+        return@Typechecker true to ""
+    }, typename)
+}
+
 inline fun <reified T> LuaValue.inner(name: String): T = this.getmetatable().get(name).touserdata(T::class.java) as T
 fun tryCall(v: () -> Unit) {
     try {

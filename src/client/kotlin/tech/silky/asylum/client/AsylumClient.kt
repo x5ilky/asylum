@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger
 import org.luaj.vm2.LuaValue
 import tech.silky.asylum.client.events.ClientBlockBreakListener
 import tech.silky.asylum.client.events.ClientDamageEntityListener
+import tech.silky.asylum.client.events.ClientReceiveMessageListener
 import tech.silky.asylum.client.std.AMinecraftLib
 import java.nio.charset.StandardCharsets
 import kotlin.math.abs
@@ -25,8 +26,8 @@ import kotlin.math.sin
 class AsylumClient : ClientModInitializer {
     companion object {
         val MOD_ID = "asylum"
+        val LOGGER: Logger = LogManager.getLogger(MOD_ID)
     }
-    val LOGGER: Logger = LogManager.getLogger(MOD_ID)
 
     var scripts = mutableMapOf<Identifier, LuaValue>()
 
@@ -38,6 +39,7 @@ class AsylumClient : ClientModInitializer {
 
         ClientBlockBreakListener.init()
         ClientDamageEntityListener.init()
+        ClientReceiveMessageListener.init()
 
         ResourceLoader.get(ResourceType.CLIENT_RESOURCES).registerReloader(
             Identifier.of(MOD_ID, "lua_reloader"),

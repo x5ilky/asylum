@@ -3,6 +3,18 @@ package tech.silky.asylum.client.std
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
+import tech.silky.asylum.client.typecheck
+
+object AEventType {
+    const val BLOCK_BREAK = "block_break"
+    const val PLAYER_DAMAGE_ENTITY = "player_damage_entity"
+    const val DISABLE = "disable"
+    const val MESSAGE_RECEIVED = "message_received"
+
+    val ALL_EVENTS = arrayOf(
+        BLOCK_BREAK, PLAYER_DAMAGE_ENTITY, DISABLE, MESSAGE_RECEIVED
+    )
+}
 
 object AEvents {
     var eventCount = 1000
@@ -13,44 +25,25 @@ object AEvents {
     }
 
     private fun initEvents() {
-        events["block_break"] = mutableMapOf()
-        events["player_damage_entity"] = mutableMapOf()
-        events["disable"] = mutableMapOf()
+        for (event in AEventType.ALL_EVENTS)
+            events[event] = mutableMapOf()
     }
 
     fun makeObject(): LuaTable {
         val table = LuaTable()
 
-        table.set("on_block_break", object : OneArgFunction() {
-            override fun call(arg: LuaValue): LuaValue {
-                val id = eventCount++
-                events["block_break"]!![id] = arg
-                return NIL
-            }
-        })
-        table.set("on_player_damage_entity", object : OneArgFunction() {
-            override fun call(arg: LuaValue): LuaValue {
-                val id = eventCount++
-                events["player_damage_entity"]!![id] = arg
-                return NIL
-            }
-        })
-        table.set("on_disable", object : OneArgFunction() {
-            override fun call(arg: LuaValue): LuaValue {
-                val id = eventCount++
-                events["disable"]!![id] = arg
-                return NIL
-            }
-        })
-        table.set("remove_event", object : OneArgFunction() {
-            override fun call(arg: LuaValue): LuaValue {
-                for ((_, v) in events) {
-                    v.remove(arg.toint())
+        for (event in AEventType.ALL_EVENTS) {
+            table.set("on_$event", object : OneArgFunction() {
+                override fun call(arg: LuaValue): LuaValue {
+                    typecheck {
+                        arg with ATypes.FUNCTION
+                    }
+                    val id = eventCount++
+                    events[event]!![id] = arg
+                    return NIL
                 }
-                return NIL
-            }
-        })
-
+            })
+        }
         return table
     }
 }
