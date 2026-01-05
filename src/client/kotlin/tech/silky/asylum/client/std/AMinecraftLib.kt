@@ -21,13 +21,16 @@ object AMinecraftLib : TwoArgFunction() {
             value("hud", AHudLib.lib)
             value("events", AEvents.makeObject())
             value("text", ATextLib.lib)
+            value("modules", luaTable {})
+            value("module_path", luaTable {})
 
             fn("get_time") { ->
                 return@fn valueOf(System.currentTimeMillis().toDouble());
             }
         }
         env.set("mc", mc)
-        env.get("package").get("loaded").set("mc", mc)
+        env.set("dofile", ARequire.dofile)
+        env.set("require", ARequire.require)
         return mc
     }
 }

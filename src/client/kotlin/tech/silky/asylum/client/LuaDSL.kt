@@ -13,7 +13,6 @@ import org.luaj.vm2.lib.VarArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import org.luaj.vm2.lib.jse.CoerceJavaToLua
 import tech.silky.asylum.client.std.ATypes
-import kotlin.math.abs
 
 class LuaTableBuilder {
     private val table = LuaTable()
@@ -116,6 +115,23 @@ fun luaTable(init: LuaTableBuilder.() -> Unit): LuaTable =
 @DslMarker
 annotation class PairDsl
 
+fun tcFor(s: String): Typechecker {
+    return Typechecker(
+        when (s) {
+            ATypes.BOOLEAN -> { v: LuaValue -> v.isboolean() to "expected boolean" }
+            ATypes.INTEGER -> { v: LuaValue -> v.isnumber() to "expected integer" }
+            ATypes.DOUBLE -> { v: LuaValue -> v.isnumber() to "expected number" }
+            ATypes.STRING -> { v: LuaValue -> v.isstring() to "expected string" }
+            ATypes.FUNCTION -> { v: LuaValue -> v.isfunction() to "expected function" }
+            ATypes.TABLE -> { v: LuaValue -> v.istable() to "expected table" }
+            ATypes.NIL -> { v: LuaValue -> v.isnil() to "expected nil" }
+            else ->
+                { v: LuaValue -> (v.get("__type").toString() == s) to "expected $s" }
+        },
+        s
+    )
+}
+
 @PairDsl
 class PairBuilder<A> {
     internal val list = mutableListOf<Pair<A, Typechecker>>()
@@ -124,19 +140,19 @@ class PairBuilder<A> {
         list += this to b
     }
     infix fun A.with(b: String) {
-        list += this to Typechecker(
-            when (b) {
-                ATypes.BOOLEAN -> { v: LuaValue -> v.isboolean() to "expected boolean" }
-                ATypes.INTEGER -> { v: LuaValue -> v.isnumber() to "expected integer" }
-                ATypes.DOUBLE -> { v: LuaValue -> v.isnumber() to "expected number" }
-                ATypes.STRING -> { v: LuaValue -> v.isstring() to "expected string" }
-                ATypes.FUNCTION -> { v: LuaValue -> v.isfunction() to "expected function" }
-                ATypes.TABLE -> { v: LuaValue -> v.istable() to "expected table" }
-                ATypes.NIL -> { v: LuaValue -> v.isnil() to "expected nil" }
-                else ->
-                    { v: LuaValue -> (v.get("__type").toString() == b) to "expected $b" }
+        list += this to tcFor(b)
+    }
+
+    infix fun Typechecker.or(b: Typechecker): Typechecker {
+        return Typechecker(
+            { v ->
+                val res1 = this.validator(v)
+                val res2 = b.validator(v)
+                if (res1.first) return@Typechecker res1
+                if (res2.first) return@Typechecker res2
+                return@Typechecker Pair(false, res1.second + "; " + res2.second)
             },
-            b
+            "${this.name} or ${b.name}"
         )
     }
 }
@@ -171,9 +187,9 @@ fun tableOf(typename: String, block: PairBuilder<String>.() -> Unit): Typechecke
 }
 
 inline fun <reified T> LuaValue.inner(name: String): T = this.getmetatable().get(name).touserdata(T::class.java) as T
-fun tryCall(v: () -> Unit) {
+fun tryCall(v: () -> LuaValue): LuaValue? {
     try {
-        v()
+        return v()
     } catch (e: LuaError) {
         println(e)
         val player = MinecraftClient.getInstance().player
@@ -181,5 +197,6 @@ fun tryCall(v: () -> Unit) {
         for (ln in e.toString().lines()) {
             player?.sendMessage(Text.of(ln), false)
         }
+        return null
     }
 }
