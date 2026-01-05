@@ -18,6 +18,9 @@ object ATypes {
     const val TEXT = "std.text.text"
     const val CLIENT_PLAYER = "std.client_player"
     const val ENTITY = "std.entity"
+    const val INVENTORY = "std.inventory"
+    const val ITEM_STACK = "std.item_stack"
+    const val ITEM = "std.item"
 
     val IDENTIFIER = tableOf("std.identifier") {
         "namespace" with STRING

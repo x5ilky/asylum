@@ -2,7 +2,7 @@ package tech.silky.asylum.client.events
 
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import org.luaj.vm2.LuaValue
-import tech.silky.asylum.client.std.AClientPlayer
+import tech.silky.asylum.client.std.player.AClientPlayer
 import tech.silky.asylum.client.std.AEntity
 import tech.silky.asylum.client.std.AEventType
 import tech.silky.asylum.client.std.AEvents

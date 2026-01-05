@@ -5,6 +5,10 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.TwoArgFunction
 import tech.silky.asylum.client.luaTable
 import tech.silky.asylum.client.std.hud.AHudLib
+import tech.silky.asylum.client.std.player.AClientPlayer
+import tech.silky.asylum.client.std.player.AInventory
+import tech.silky.asylum.client.std.player.AItem
+import tech.silky.asylum.client.std.player.AItemStack
 import tech.silky.asylum.client.std.text.ATextLib
 
 object AMinecraftLib : TwoArgFunction() {
@@ -15,9 +19,13 @@ object AMinecraftLib : TwoArgFunction() {
             value("events", AEvents.makeObject())
             value("identifier", AIdentifier.lib)
             value("client_player", AClientPlayer.lib)
+            value("entity", AEntity.lib)
             value("hud", AHudLib.lib)
             value("events", AEvents.makeObject())
             value("text", ATextLib.lib)
+            value("inventory", AInventory.lib)
+            value("item", AItem.lib)
+            value("item_stack", AItemStack.lib)
             value("modules", luaTable {})
             value("module_path", luaTable {})
 

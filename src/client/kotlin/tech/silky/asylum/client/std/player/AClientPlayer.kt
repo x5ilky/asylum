@@ -1,17 +1,17 @@
-package tech.silky.asylum.client.std
+package tech.silky.asylum.client.std.player
 
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.network.ClientPlayerEntity
+import net.minecraft.inventory.Inventory
 import net.minecraft.sound.SoundEvent
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import org.luaj.vm2.LuaValue
-import org.luaj.vm2.LuaValue.NIL
-import org.luaj.vm2.LuaValue.valueOf
 import org.luaj.vm2.lib.TwoArgFunction
 import tech.silky.asylum.client.IOBJ
 import tech.silky.asylum.client.inner
 import tech.silky.asylum.client.luaTable
+import tech.silky.asylum.client.std.ATypes
 import tech.silky.asylum.client.std.position.AWorld
 import tech.silky.asylum.client.typecheck
 import kotlin.random.Random
@@ -21,7 +21,7 @@ object AClientPlayer {
         val table = luaTable {
             value("__type", LuaValue.valueOf(ATypes.CLIENT_PLAYER))
             attach(IOBJ, player)
-            value("_id", LuaValue.valueOf(Random.nextInt(9999)))
+            value("_id", LuaValue.valueOf(Random.Default.nextInt(9999)))
             metatable("__index", lib)
             metatable("__tostring", object : TwoArgFunction() {
                 override fun call(table: LuaValue, unused: LuaValue?): LuaValue? {
@@ -34,8 +34,13 @@ object AClientPlayer {
     }
     val lib = luaTable {
         fn("get_instance") { ->
-            val player = MinecraftClient.getInstance().player ?: return@fn NIL
+            val player = MinecraftClient.getInstance().player ?: return@fn LuaValue.NIL
             return@fn makePlayer(player)
+        }
+        fn("get_inventory") { self ->
+            typecheck { self with ATypes.CLIENT_PLAYER }
+            val player = self.inner<ClientPlayerEntity>(IOBJ)
+            return@fn AInventory.make(player.inventory)
         }
         fn("send_message") { self, arg ->
             typecheck { self with ATypes.CLIENT_PLAYER; arg with ATypes.TEXT }
@@ -48,7 +53,7 @@ object AClientPlayer {
         fn("get_display_name") { self ->
             typecheck { self with ATypes.CLIENT_PLAYER }
             val player = self.inner<ClientPlayerEntity>(IOBJ)
-            return@fn valueOf(player.name.literalString)
+            return@fn LuaValue.valueOf(player.name.literalString)
         }
         fn("get_world") { self ->
             typecheck { self with ATypes.CLIENT_PLAYER }

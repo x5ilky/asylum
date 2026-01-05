@@ -66,11 +66,10 @@ object ATextLib {
             }, Style.EMPTY)
             return@fn LuaValue.NIL
         }
-        metatable("__tostring", object : OneArgFunction() {
-            override fun call(arg: LuaValue): LuaValue {
-                val text = arg.inner<Text>(IOBJ)
-                return LuaValue.valueOf(text.toString())
-            }
-        })
+        fn("tostring") { self ->
+            typecheck { self with ATypes.TEXT }
+            val text = self.inner<Text>(IOBJ)
+            return@fn LuaValue.valueOf(text.toString())
+        }
     }
 }

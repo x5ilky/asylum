@@ -2,7 +2,7 @@ package tech.silky.asylum.client.events
 
 import net.fabricmc.fabric.api.event.client.player.ClientPlayerBlockBreakEvents
 import tech.silky.asylum.client.std.AEvents
-import tech.silky.asylum.client.std.AClientPlayer
+import tech.silky.asylum.client.std.player.AClientPlayer
 import tech.silky.asylum.client.std.AEventType
 import tech.silky.asylum.client.std.block.ABlock
 import tech.silky.asylum.client.std.position.ALocalPosition

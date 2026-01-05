@@ -132,9 +132,22 @@ class AsylumClient : ClientModInitializer {
         while (ran.any {!it.value}) {
             var found = false
             for ((k, v) in mods) {
+                if (v.dependencies.any { !ran.containsKey(it) }) {
+                    player?.sendMessage(Text.literal("Pack $k has missing dependency"), false)
+                    mc.toastManager.add(
+                        SystemToast.create(mc, SystemToast.Type.NARRATOR_TOGGLE,
+                            Text.literal("Hello World!"), Text.literal("This is a toast."))
+                    )
+                    for ((k, v) in mods) {
+                        player?.sendMessage(Text.literal("$k depends on {${v.dependencies.joinToString(", h")}}"), false)
+                    }
+                    return
+                }
                 if (v.dependencies.any { !ran[it]!! }) continue
 
-                v.init.call()
+                tryCall {
+                    v.init.call()
+                }
                 ran[k] = true
                 mods.remove(k)
 

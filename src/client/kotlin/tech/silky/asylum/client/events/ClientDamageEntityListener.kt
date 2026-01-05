@@ -2,7 +2,7 @@ package tech.silky.asylum.client.events
 
 import tech.silky.asylum.client.event.ClientPlayerHitEntityEvent
 import tech.silky.asylum.client.std.AEvents
-import tech.silky.asylum.client.std.AClientPlayer
+import tech.silky.asylum.client.std.player.AClientPlayer
 import tech.silky.asylum.client.std.AEntity
 import tech.silky.asylum.client.std.AEventType
 import tech.silky.asylum.client.tryCall
