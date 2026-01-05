@@ -17,8 +17,6 @@ import tech.silky.asylum.client.events.ClientBlockBreakListener
 import tech.silky.asylum.client.events.ClientDamageEntityListener
 import tech.silky.asylum.client.events.ClientReceiveMessageListener
 import tech.silky.asylum.client.std.AMinecraftLib
-import tech.silky.asylum.client.std.ARequire
-import tech.silky.asylum.client.util.PathHelper
 import java.nio.charset.StandardCharsets
 
 
@@ -77,7 +75,7 @@ class AsylumClient : ClientModInitializer {
 //                    for (i in restore+1..mp.length()) {
 //                        mp.set(i, NIL)
 //                    }
-                    return v;
+                    return v
                 }
             }
             println("Loaded Lua: $id (${content.length} bytes)")
@@ -98,15 +96,15 @@ class AsylumClient : ClientModInitializer {
                     mc.toastManager.add(
                         SystemToast.create(mc, SystemToast.Type.NARRATOR_TOGGLE,
                             Text.literal("Hello World!"), Text.literal("This is a toast."))
-                    );
-                    continue;
+                    )
+                    continue
                 }
 
                 val dependencies = mutableListOf<String>()
                 val rawDependencies = module.get("dependencies")
                 if (!rawDependencies.isnil() && rawDependencies.istable()) {
                    for (i in 1..rawDependencies.length()) {
-                       dependencies += rawDependencies.get(i).toString();
+                       dependencies += rawDependencies.get(i).toString()
                    }
                 }
 
@@ -116,8 +114,8 @@ class AsylumClient : ClientModInitializer {
                     mc.toastManager.add(
                         SystemToast.create(mc, SystemToast.Type.NARRATOR_TOGGLE,
                             Text.literal("Hello World!"), Text.literal("This is a toast."))
-                    );
-                    continue;
+                    )
+                    continue
                 }
 
                 mods[k.namespace] = LuaModule(
@@ -129,10 +127,10 @@ class AsylumClient : ClientModInitializer {
         }
 
         val ran = mutableMapOf<String, Boolean>()
-        for ((k, _) in mods) ran[k] = false;
+        for ((k, _) in mods) ran[k] = false
 
         while (ran.any {!it.value}) {
-            var found = false;
+            var found = false
             for ((k, v) in mods) {
                 if (v.dependencies.any { !ran[it]!! }) continue
 
@@ -140,18 +138,18 @@ class AsylumClient : ClientModInitializer {
                 ran[k] = true
                 mods.remove(k)
 
-                found = true;
+                found = true
             }
             if (!found && ran.any {!it.value}) {
                 player?.sendMessage(Text.literal("Infinite loop detected in module evaluation"), false)
                 mc.toastManager.add(
                     SystemToast.create(mc, SystemToast.Type.NARRATOR_TOGGLE,
                         Text.literal("Hello World!"), Text.literal("This is a toast."))
-                );
+                )
                 for ((k, v) in mods) {
                     player?.sendMessage(Text.literal("$k depends on {${v.dependencies.joinToString(", h")}}"), false)
                 }
-                return;
+                return
             }
         }
     }

@@ -1,11 +1,8 @@
 package tech.silky.asylum.client.std
 
-import net.minecraft.client.MinecraftClient
 import org.luaj.vm2.Globals
-import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.TwoArgFunction
-import org.luaj.vm2.lib.ZeroArgFunction
 import tech.silky.asylum.client.luaTable
 import tech.silky.asylum.client.std.hud.AHudLib
 import tech.silky.asylum.client.std.text.ATextLib
@@ -25,7 +22,7 @@ object AMinecraftLib : TwoArgFunction() {
             value("module_path", luaTable {})
 
             fn("get_time") { ->
-                return@fn valueOf(System.currentTimeMillis().toDouble());
+                return@fn valueOf(System.currentTimeMillis().toDouble())
             }
         }
         env.set("mc", mc)
