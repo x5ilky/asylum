@@ -45,6 +45,7 @@ object AHudLib {
             value("player_list", id(Identifier.ofVanilla("player_list")))
             value("subtitles", id(Identifier.ofVanilla("subtitles")))
         })
+        value("draw_context", ADrawContext.lib)
 
         fn("add_before") { layerRaw, fn ->
             typecheck { layerRaw with ATypes.IDENTIFIER; fn with ATypes.FUNCTION }
