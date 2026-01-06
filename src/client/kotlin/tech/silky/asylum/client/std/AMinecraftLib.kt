@@ -3,6 +3,8 @@ package tech.silky.asylum.client.std
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.TwoArgFunction
+import org.luaj.vm2.lib.ZeroArgFunction
+import tech.silky.asylum.client.AsylumClient
 import tech.silky.asylum.client.luaTable
 import tech.silky.asylum.client.std.hud.AHudLib
 import tech.silky.asylum.client.std.player.AClientPlayer
@@ -29,10 +31,14 @@ object AMinecraftLib : TwoArgFunction() {
             value("modules", luaTable {})
             value("module_path", luaTable {})
 
+            value("version", valueOf(AsylumClient.VERSION))
+
+
             fn("get_time") { ->
                 return@fn valueOf(System.currentTimeMillis().toDouble())
             }
         }
+
         env.set("mc", mc)
         env.set("dofile", ARequire.dofile)
         env.set("require", ARequire.require)

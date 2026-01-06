@@ -2,6 +2,8 @@ package tech.silky.asylum.client
 
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
+import net.fabricmc.loader.api.FabricLoader
+import net.fabricmc.loader.api.ModContainer
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.toast.SystemToast
 import net.minecraft.resource.ResourceManager
@@ -19,6 +21,7 @@ import tech.silky.asylum.client.events.ClientReceiveMessageListener
 import tech.silky.asylum.client.misc.LuaModule
 import tech.silky.asylum.client.std.AMinecraftLib
 import java.nio.charset.StandardCharsets
+import java.util.Optional
 
 
 class AsylumClient : ClientModInitializer {
@@ -27,11 +30,17 @@ class AsylumClient : ClientModInitializer {
         val LOGGER: Logger = LogManager.getLogger(MOD_ID)
         var scripts = mutableMapOf<Identifier, LuaValue>()
 
-
+        lateinit var VERSION: String;
     }
 
 
     override fun onInitializeClient() {
+        val mod: Optional<ModContainer> = FabricLoader.getInstance().getModContainer(MOD_ID)
+
+        mod.ifPresent { container ->
+            VERSION = container.metadata.version.friendlyString
+        }
+
         AsylumLua.init()
         AsylumLua.hook { alua ->
             alua.globals.set("package", LuaValue.NIL)
