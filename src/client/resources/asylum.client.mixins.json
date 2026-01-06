@@ -4,7 +4,9 @@
   "package": "tech.silky.asylum.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "ClientPlayerInteractionManagerMixin"
+    "ClientPlayerInteractionManagerMixin",
+    "InGameHudMixin",
+    "InGameHudTooltipMixin"
   ],
   "injectors": {
     "defaultRequire": 1

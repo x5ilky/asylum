@@ -3,13 +3,16 @@ package tech.silky.asylum.client.std.hud
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.minecraft.client.MinecraftClient
 import net.minecraft.util.Identifier
+import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue
 import tech.silky.asylum.client.AsylumClient
 import tech.silky.asylum.client.luaTable
+import tech.silky.asylum.client.misc.AsylumRuntimeData
 import tech.silky.asylum.client.std.AIdentifier
 import tech.silky.asylum.client.std.ATypes
 import tech.silky.asylum.client.tryCall
 import tech.silky.asylum.client.typecheck
+import kotlin.toString
 
 object AHudLib {
     val guiLayers = mutableMapOf<Int, Identifier>()
@@ -104,6 +107,28 @@ object AHudLib {
         fn("get_scaled_screen_height") { ->
             val client = MinecraftClient.getInstance()
             return@fn LuaValue.valueOf(client.window.scaledHeight)
+        }
+
+        fn("show") { type ->
+            val key = type.toString()
+            if (!AsylumRuntimeData.displayFlags.containsKey(key))
+                throw LuaError("Cannot show `$type`; it is not a vanilla HUD element")
+            AsylumRuntimeData.displayFlags[key] = true
+            return@fn LuaValue.NIL
+        }
+        fn("hide") { type ->
+            val key = type.toString()
+            if (!AsylumRuntimeData.displayFlags.containsKey(key))
+                throw LuaError("Cannot show `$type`; it is not a vanilla HUD element")
+            AsylumRuntimeData.displayFlags[key] = false
+            return@fn LuaValue.NIL
+        }
+        fn("is_hidden") { type ->
+            val key = type.toString()
+            if (!AsylumRuntimeData.displayFlags.containsKey(key))
+                throw LuaError("Cannot show `$type`; it is not a vanilla HUD element")
+
+            return@fn LuaValue.valueOf(AsylumRuntimeData.displayFlags[key]!!)
         }
     }
 }

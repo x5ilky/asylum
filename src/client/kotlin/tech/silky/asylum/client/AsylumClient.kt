@@ -16,6 +16,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
 import tech.silky.asylum.client.events.ClientBlockBreakListener
 import tech.silky.asylum.client.events.ClientDamageEntityListener
 import tech.silky.asylum.client.events.ClientReceiveMessageListener
+import tech.silky.asylum.client.misc.LuaModule
 import tech.silky.asylum.client.std.AMinecraftLib
 import java.nio.charset.StandardCharsets
 
@@ -25,6 +26,8 @@ class AsylumClient : ClientModInitializer {
         const val MOD_ID = "asylum"
         val LOGGER: Logger = LogManager.getLogger(MOD_ID)
         var scripts = mutableMapOf<Identifier, LuaValue>()
+
+
     }
 
 

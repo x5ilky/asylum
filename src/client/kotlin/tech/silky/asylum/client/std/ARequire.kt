@@ -7,7 +7,7 @@ import tech.silky.asylum.client.AsylumClient
 import tech.silky.asylum.client.AsylumLua
 import tech.silky.asylum.client.tcFor
 import tech.silky.asylum.client.typecheck
-import tech.silky.asylum.client.util.PathHelper
+import tech.silky.asylum.client.misc.PathHelper
 
 object ARequire {
     val dofile = object : OneArgFunction() {

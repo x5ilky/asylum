@@ -3,22 +3,17 @@ package tech.silky.asylum.client.std.hud
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gl.RenderPipelines
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.sound.SoundEvent
+import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
-import net.minecraft.util.Identifier
 import org.luaj.vm2.LuaValue
-import org.luaj.vm2.LuaValue.valueOf
 import org.luaj.vm2.lib.TwoArgFunction
 import tech.silky.asylum.client.IOBJ
 import tech.silky.asylum.client.inner
 import tech.silky.asylum.client.luaTable
 import tech.silky.asylum.client.std.AIdentifier
 import tech.silky.asylum.client.std.ATypes
-import tech.silky.asylum.client.std.position.AWorld
 import tech.silky.asylum.client.tableOf
 import tech.silky.asylum.client.typecheck
-import kotlin.random.Random
 
 object ADrawContext {
     fun make(ctx: DrawContext): LuaValue {
@@ -66,6 +61,20 @@ object ADrawContext {
             val textRenderer = client.textRenderer
 
             ctx.drawText(textRenderer, text, x1.toint(), y1.toint(), color.toint(), false)
+
+            return@fn LuaValue.NIL
+        }
+        fn("draw_item") { self, itemStack, x, y ->
+            typecheck {
+                self with ATypes.DRAW_CONTEXT
+                itemStack with ATypes.ITEM_STACK
+                x with ATypes.INTEGER
+                y with ATypes.INTEGER
+            }
+
+            val ctx = self.inner<DrawContext>(IOBJ)
+
+            ctx.drawItem(itemStack.inner<ItemStack>(IOBJ), x.toint(), y.toint())
 
             return@fn LuaValue.NIL
         }

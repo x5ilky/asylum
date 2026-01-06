@@ -1,4 +1,4 @@
-package tech.silky.asylum.client
+package tech.silky.asylum.client.misc
 
 import org.luaj.vm2.LuaValue
 

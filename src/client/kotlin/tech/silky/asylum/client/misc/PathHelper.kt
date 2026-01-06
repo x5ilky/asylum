@@ -1,4 +1,4 @@
-package tech.silky.asylum.client.util
+package tech.silky.asylum.client.misc
 
 object PathHelper {
     fun getFolderFromPath(id: String): String {
