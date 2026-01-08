@@ -141,40 +141,39 @@ class AsylumClient : ClientModInitializer {
         val ran = mutableMapOf<String, Boolean>()
         for ((k, _) in mods) ran[k] = false
 
-        while (ran.any {!it.value}) {
-            var found = false
-            for ((k, v) in mods) {
-                if (v.dependencies.any { !ran.containsKey(it) }) {
-                    player?.sendMessage(Text.literal("Pack $k has missing dependency"), false)
-                    mc.toastManager.add(
-                        SystemToast.create(mc, SystemToast.Type.NARRATOR_TOGGLE,
-                            Text.literal("Hello World!"), Text.literal("This is a toast."))
-                    )
-                    for ((k, v) in mods) {
-                        player?.sendMessage(Text.literal("$k depends on {${v.dependencies.joinToString(", h")}}"), false)
-                    }
-                    return
-                }
-                if (v.dependencies.any { !ran[it]!! }) continue
+        val modules = AsylumLua.globals.get("mc").get("modules")
+        val keys = mods.keys.toList()
 
-                tryCall {
-                    v.init.call()
+        fun dfs(key: String, trace: List<String>): Boolean {
+            if (ran[key]!!) return true;
+            for (dep in mods[key]!!.dependencies) {
+                if (ran[dep]!!) continue;
+                if (trace.contains(dep)) {
+                    // cycle detected
+                    val message = listOf("Circular dependency list has been detected!",
+                        trace.joinToString(" -> "))
+                    for (ln in message)
+                        player?.sendMessage(Text.literal(ln), false)
+                    return false
                 }
-                ran[k] = true
-                mods.remove(k)
-
-                found = true
+                if (!dfs(dep, listOf(*trace.toTypedArray(), dep))) {
+                    return false
+                }
             }
-            if (!found && ran.any {!it.value}) {
-                player?.sendMessage(Text.literal("Infinite loop detected in module evaluation"), false)
-                mc.toastManager.add(
-                    SystemToast.create(mc, SystemToast.Type.NARRATOR_TOGGLE,
-                        Text.literal("Hello World!"), Text.literal("This is a toast."))
-                )
-                for ((k, v) in mods) {
-                    player?.sendMessage(Text.literal("$k depends on {${v.dependencies.joinToString(", h")}}"), false)
-                }
-                return
+            ran[key] = true
+
+
+            val value = tryCall {
+                mods[key]!!.init.call()
+            }
+            if (value != LuaValue.NIL && value != null) {
+                modules.set(key, value)
+                return true;
+            } else return false;
+        }
+        for (i in 0..<keys.size) {
+            if (!ran[keys[i]]!!) {
+                dfs(keys[i], listOf(keys[i]))
             }
         }
     }

@@ -51,7 +51,7 @@ object AHudLib {
             typecheck { layerRaw with ATypes.IDENTIFIER; fn with ATypes.FUNCTION }
             val layer = AIdentifier.from(layerRaw)
             val c = guiCount++
-            val id = Identifier.of(AsylumClient.MOD_ID, "asylum_userguilayer$guiCount")
+            val id = Identifier.of(AsylumClient.MOD_ID, "asylum_userguilayer$c")
             guiLayers[c] = id
 
             HudElementRegistry.attachElementBefore(layer, id) { context, tickCounter ->
@@ -69,7 +69,7 @@ object AHudLib {
             typecheck { layerRaw with ATypes.IDENTIFIER; fn with ATypes.FUNCTION }
             val layer = AIdentifier.from(layerRaw)
             val c = guiCount++
-            val id = Identifier.of(AsylumClient.MOD_ID, "asylum_userguilayer$guiCount")
+            val id = Identifier.of(AsylumClient.MOD_ID, "asylum_userguilayer$c")
             guiLayers[c] = id
 
             HudElementRegistry.attachElementAfter(layer, id) { context, tickCounter ->
